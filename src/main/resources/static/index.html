@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="whatApp">
+<head>
+    <meta charset="UTF-8">
+    <title>What To Eat?</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body ng-controller="whatCtrl">
+    <div id="wrapper">
+        <h1>What to eat?<br><br>
+        <b id="what">{{what}}</b>
+        </h1>
+        <div class="row" ng-show="chose">
+            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
+                <button class="btn btn-info btn-block m-tb-sm" ng-click="getWhat()">Choose for me</button>
+            </div>
+            <div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
+                <button class="btn btn-default btn-block m-tb-sm" ng-click="exit()">No, thanks</button>
+            </div>
+        </div>
+        <input  ng-show="start" type="button" value="Start" id="start">
+        <input type="button" value="Start" id="stop">
+    </div>
+
+    <label>
+            <textarea rows="9" cols="53" id="list" style="display: none">
+                {{whatList}}
+            </textarea>
+    </label>
+
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+    <script type="text/javascript">
+        var what = angular.module('whatApp',[]);
+        what.controller('whatCtrl',function ($scope,$http) {
+            $scope.chose = true;
+            $scope.start = false;
+            $scope.whatList = "";
+
+            $scope.getWhat = function () {
+                setTimeout(function () {
+                    $scope.chose = !$scope.chose;
+                    setTimeout(function () {
+                        $http({
+                            method: 'POST',
+                            url: "http://193.112.72.214:99/what/toEat",
+                            // url: "http://localhost:8080/what/toEat",
+                            data:{},
+                            headers: {'Content-Type': undefined},
+                            transformRequest: angular.identity()
+                        }).then(function success(response) {
+                            var dat = response.data.data;
+                            // var json = JSON.stringify(dat);
+                            // console.log(json);
+                            for (var i=0;i < dat.length;i++){
+                                $scope.whatList += dat[i].what + '\n';
+                            }
+                            console.log($scope.whatList);
+                            $scope.start = !$scope.start;
+                            alert("Click \<Start\> to begin!");
+                        })
+                    })
+                });
+
+
+            };
+
+            $scope.exit = function () {
+                $scope.chose = !$scope.chose;
+                alert("Why did you visit this website?")
+            }
+        })
+    </script>
+</body>
+</html>
